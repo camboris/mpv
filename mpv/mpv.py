@@ -14,12 +14,15 @@ queries = [
         'url': 'https://api.maspocovendo.com/api/publications/search?category=MLA1473&cities=Rafaela,+Santa+Fe&lat=-31.24552&lon=-61.49147&distance=250&page=1&per_page=50'
     },
     {
-        'id': 'casas',
+        'id': 'casa',
         'url': 'https://api.maspocovendo.com/api/publications/search?category=MLA1467&cities=Rafaela,+Santa+Fe&lat=-31.24552&lon=-61.49147&distance=250&page=1&per_page=50'
     }
 ]
 
+wh = "https://discord.com/api/webhooks/824831189981593600/084mhOQiVl19aUnJ4DEkmLJD9z1uKMlcC7sfczR1g1V94TbO-pAtOVVMcp2ZHOizHicw"
+
 mpv_base_url = "https://www.maspocovendo.com/{}/{}"
+maps_base_url = "https://www.google.com/maps/@{},{},18z"
 # mpv_date_now = datetime.now()
 
 def procesar_query(query, last):
@@ -44,11 +47,39 @@ def procesar_query(query, last):
     return items
 
 
-def notificar_items(items):
+def notificar_items(items, query):
     for item in items:
         post_slug = slugify(item['title'])
         post_id = item['id']
-        print(mpv_base_url.format(post_slug, post_id))
+        post_url = mpv_base_url.format(post_slug, post_id)
+
+        discord = {
+            "content": query["id"],
+            "embeds": [{
+                "title": item['title'],
+                "url": post_url,
+                "fields": [{
+                    "name": "Alquiler",
+                    "value": item['price'],
+                    "inline": True
+                },{
+                    "name": "Fecha",
+                    "value": item['date'],
+                    "inline": True
+                },{
+                    "name": "Ubicacion",
+                    "value": maps_base_url.format(item["geopoint"]["coordinates"]["latitude"],item["geopoint"]["coordinates"]["longitude"] ),
+                    "inline": False
+                }]
+                # "image": {
+                #     "url": item["media"][0]["image_file_name"]
+                # }
+            }]
+        }
+        # djson = json.dumps(discord, default=str)
+        p = requests.post(wh, json=discord)
+        # print(djson)
+        print(p.status_code)
 
 
 def save_last_item(items):
@@ -91,7 +122,7 @@ if __name__ == "__main__":
     last_dict = open_last()
     for q in queries:
         items = procesar_query(q, last_dict[q['id']])
-        notificar_items(items)
+        notificar_items(items, q)
         last_item = save_last_item(items)
 
         if last_item is not None:
