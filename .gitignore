@@ -1,3 +1,7 @@
+mpv.log
+mpv_last.json
+#
+#
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
