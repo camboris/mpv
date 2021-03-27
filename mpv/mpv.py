@@ -5,7 +5,7 @@ import json
 from datetime import datetime, timedelta
 from slugify import slugify
 
-logging.basicConfig(filename='mpv.log', encoding='utf-8', level=logging.DEBUG)
+# logging.basicConfig(filename='mpv.log', encoding='utf-8', level=logging.DEBUG)
 logger = logging.getLogger("mpv")
 
 queries = [
@@ -103,14 +103,14 @@ def save_last_item(items):
 
 
 def open_last():
-    with open('mpv_last.json', 'r') as infile:
+    with open('output/mpv_last.json', 'r') as infile:
         data = json.load(infile)
 
     return data
 
 
 def save_last(last_dict):
-    with open('mpv_last.json', 'w') as outfile:
+    with open('output/mpv_last.json', 'w') as outfile:
         # json.dumps(last_json, default=str))
         json.dump(last_dict, outfile, default=str)
 
